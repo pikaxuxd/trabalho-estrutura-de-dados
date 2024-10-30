@@ -1,0 +1,149 @@
+#include <stdlib.h>
+#include <stdio.h>
+#define MAX 100
+
+
+typedef struct no {
+    int indice;
+    float nota;
+} No;
+
+
+typedef struct lista {
+    No* listaDeNos[MAX];
+    int numElem;
+} Lista;
+
+
+void inicializarLista(Lista* lista);
+int inserirElemFinal(Lista* lista, No* no);
+int inserirEmOrdem(Lista* lista, No* no);
+void exibirLista(Lista* lista);
+int verificarVazia(Lista* lista);
+int buscarLista(Lista* lista, int indice);
+int excluirElemLista(Lista* lista, int indice);
+void liberarLista(Lista* lista);
+
+
+void inicializarLista(Lista* lista) {
+    lista->numElem = 0;
+}
+
+
+int verificarVazia(Lista* lista) {
+    return lista->numElem == 0;
+}
+
+
+void exibirLista(Lista* lista) {
+    if (verificarVazia(lista)) {
+        printf("Lista vazia\n");
+    } else {
+        printf("\n====== LISTA ======\n");
+        for (int i = 0; i < lista->numElem; i++) {
+            printf("Índice %d: Nota %.2f\n", lista->listaDeNos[i]->indice, lista->listaDeNos[i]->nota);
+        }
+        printf("===================\n");
+    }
+}
+
+
+int inserirElemFinal(Lista* lista, No* no) {
+    if (lista->numElem == MAX) {
+        printf("Lista cheia\n");
+        return 0;
+    }
+    lista->listaDeNos[lista->numElem] = no;
+    lista->numElem++;
+    printf("Elemento inserido\n");
+    return 1;
+}
+
+
+int inserirEmOrdem(Lista* lista, No* no) {
+    if (lista->numElem == MAX) {
+        printf("Lista cheia\n");
+        return 0;
+    }
+    int i = lista->numElem - 1;
+    while (i >= 0 && lista->listaDeNos[i]->nota > no->nota) {
+        lista->listaDeNos[i + 1] = lista->listaDeNos[i];
+        i--;
+    }
+    lista->listaDeNos[i + 1] = no;
+    lista->numElem++;
+    printf("Elemento inserido em ordem\n");
+    return 1;
+}
+
+
+int buscarLista(Lista* lista, int indice) {
+    for (int i = 0; i < lista->numElem; i++) {
+        if (lista->listaDeNos[i]->indice == indice) {
+            return i;  
+        }
+    }
+    return -1;  
+}
+
+
+int excluirElemLista(Lista* lista, int indice) {
+    int posicao = buscarLista(lista, indice);
+    if (posicao == -1) {
+        printf("Elemento não encontrado\n");
+        return 0;
+    }
+    free(lista->listaDeNos[posicao]);
+    for (int i = posicao; i < lista->numElem - 1; i++) {
+        lista->listaDeNos[i] = lista->listaDeNos[i + 1];
+    }
+    lista->numElem--;
+    printf("Elemento excluído\n");
+    return 1;
+}
+
+
+void liberarLista(Lista* lista) {
+    for (int i = 0; i < lista->numElem; i++) {
+        free(lista->listaDeNos[i]);
+    }
+    lista->numElem = 0;
+    printf("Lista liberada\n");
+}
+
+
+int main() {
+    Lista l;
+    inicializarLista(&l);
+
+    
+    exibirLista(&l);
+
+    
+    No* n1 = (No*)malloc(sizeof(No));
+    n1->indice = 1;
+    n1->nota = 5.5;
+    inserirEmOrdem(&l, n1);
+
+    No* n2 = (No*)malloc(sizeof(No));
+    n2->indice = 2;
+    n2->nota = 8.5;
+    inserirEmOrdem(&l, n2);
+
+    No* n3 = (No*)malloc(sizeof(No));
+    n3->indice = 3;
+    n3->nota = 6.5;
+    inserirEmOrdem(&l, n3);
+
+    
+    exibirLista(&l);
+
+    
+    excluirElemLista(&l, 2);
+    exibirLista(&l);
+
+    
+    liberarLista(&l);
+
+    return 0;
+}
